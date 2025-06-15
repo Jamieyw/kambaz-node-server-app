@@ -6,10 +6,7 @@ export function findAssignmentsForCourse(courseId) {
 }
 
 export function createAssignment(assignment) {
-  const newAssignment = {
-    ...assignment,
-    _id: uuidv4(),
-  };
+  const newAssignment = {...assignment, _id: uuidv4()};
   Database.assignments.push(newAssignment);
   return newAssignment;
 }
@@ -18,18 +15,14 @@ export function deleteAssignment(assignmentId) {
   Database.assignments = Database.assignments.filter(
     (a) => a._id !== assignmentId
   );
-  return { status: "OK", message: `Assignment with ID ${assignmentId} deleted` };
 }
 
 export function updateAssignment(assignmentId, assignmentUpdates) {
   const assignment = Database.assignments.find(
     (a) => a._id === assignmentId
   );
-  if (!assignment) {
-    return { status: "Error", message: `Assignment with ID ${assignmentId} not found` };
-  }
   Object.assign(assignment, assignmentUpdates);
-  return { status: "OK", message: `Assignment with ID ${assignmentId} updated` };
+  return assignment;
 }
 
 export function findAssignmentById(assignmentId) {

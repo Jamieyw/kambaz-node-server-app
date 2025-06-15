@@ -1,15 +1,15 @@
-import * as dao from "./dao.js";
+import * as AssignmentDao from "./dao.js";
 
 export default function AssignmentRoutes(app) {
-  app.get("/api/courses/:cid/assignments", (req, res) => {
-    const { cid } = req.params;
-    const courseAssignments = dao.findAssignmentsForCourse(cid);
-    res.json(courseAssignments);
+  app.delete("/api/assignments/:aid", (req, res) => {
+    const { aid } = req.params;
+    const status = AssignmentDao.deleteAssignment(aid);
+    res.send(status);
   });
 
   app.get("/api/assignments/:aid", (req, res) => {
     const { aid } = req.params;
-    const assignment = dao.findAssignmentById(aid);
+    const assignment = AssignmentDao.findAssignmentById(aid);
     if (assignment) {
       res.json(assignment);
     } else {
@@ -20,21 +20,7 @@ export default function AssignmentRoutes(app) {
   app.put("/api/assignments/:aid", (req, res) => {
     const { aid } = req.params;
     const assignmentUpdates = req.body;
-    const result = dao.updateAssignment(aid, assignmentUpdates);
-    if (result.status === "OK") {
-      res.json(result);
-    } else {
-      res.status(404).send(result.message);
-    }
-  });
-
-  app.delete("/api/assignments/:aid", (req, res) => {
-    const { aid } = req.params;
-    const result = dao.deleteAssignment(aid);
-    if (result.status === "OK") {
-      res.json(result);
-    } else {
-      res.status(404).send(result.message);
-    }
+    const result = AssignmentDao.updateAssignment(aid, assignmentUpdates);
+    res.send(result);
   });
 }
