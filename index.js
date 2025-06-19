@@ -8,6 +8,10 @@ import "dotenv/config";
 import session from "express-session";
 import ModuleRoutes from "./Kambaz/Modules/routes.js";
 import AssignmentRoutes from './Kambaz/Assignments/routes.js';
+import mongoose from 'mongoose';
+
+const CONNECTION_STRING = process.env.MONGO_CONNECTION_STRING || "mongodb://127.0.0.1:27017/kambaz";
+mongoose.connect(CONNECTION_STRING);
 
 const app = express();
 // make sure cors (Cross-Origin Resource Sharing) is used right after creating the app express instance
@@ -38,6 +42,7 @@ if (process.env.NODE_ENV !== "development") {  // checks if the application is r
   };
 }
 app.use(session(sessionOptions));  // Use the session middleware
+
 // make sure this statement occurs AFTER setting up CORS but BEFORE all the routes
 app.use(express.json());  // Parses JSON bodies of incoming requests and makes it available on req.body
 
