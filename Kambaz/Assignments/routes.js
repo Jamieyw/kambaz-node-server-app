@@ -1,15 +1,15 @@
 import * as AssignmentDao from "./dao.js";
 
 export default function AssignmentRoutes(app) {
-  app.delete("/api/assignments/:aid", (req, res) => {
+  app.delete("/api/assignments/:aid", async (req, res) => {
     const { aid } = req.params;
-    const status = AssignmentDao.deleteAssignment(aid);
+    const status = await AssignmentDao.deleteAssignment(aid);
     res.send(status);
   });
 
-  app.get("/api/assignments/:aid", (req, res) => {
+  app.get("/api/assignments/:aid", async (req, res) => {
     const { aid } = req.params;
-    const assignment = AssignmentDao.findAssignmentById(aid);
+    const assignment = await AssignmentDao.findAssignmentById(aid);
     if (assignment) {
       res.json(assignment);
     } else {
@@ -17,10 +17,10 @@ export default function AssignmentRoutes(app) {
     }
   });
 
-  app.put("/api/assignments/:aid", (req, res) => {
+  app.put("/api/assignments/:aid", async (req, res) => {
     const { aid } = req.params;
     const assignmentUpdates = req.body;
-    const result = AssignmentDao.updateAssignment(aid, assignmentUpdates);
+    const result = await AssignmentDao.updateAssignment(aid, assignmentUpdates);
     res.send(result);
   });
 }

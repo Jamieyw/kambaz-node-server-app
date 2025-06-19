@@ -1,36 +1,28 @@
-import Database from "../Database/index.js";
+import model from "./model.js";
 import { v4 as uuidv4 } from "uuid";
 
-export function findEnrollmentsForUser(userId) {
-  return Database.enrollments.filter((enrollment) => enrollment.user === userId);
+// model.find().populate() returns a Promise (it's an asynchronous 
+// database operation), await pauses the execution of this function 
+// until that Promise resolves
+export async function findCoursesForUser(userId) {
+  // .populate("course") tells Mongoose: "For each enrollment document that 
+  // you found, look at the _id stored in its course field, then go to the 
+  // courses collection (or whatever collection CourseModel refers to), 
+  // find the corresponding Course document, and replace the course _id 
+  // in the enrollment document with the entire Course document."
+  const enrollments = await model.find({ user: userId }).populate("course");
+  return enrollments.map((enrollment) => enrollment.course);
 }
 
-export function enrollUserInCourse(userId, courseId) {
-  // Check if the user is already enrolled to prevent duplicates
-  const existingEnrollment = Database.enrollments.find(
-    (enrollment) => enrollment.user === userId && enrollment.course === courseId
-  );
-  if (existingEnrollment) {
-    return { status: "Conflict", message: "User is already enrolled in this course." };
-  }
-
-  const newEnrollment = {
-    _id: uuidv4(),
-    user: userId,
-    course: courseId,
-  };
-  Database.enrollments.push(newEnrollment);
-  return newEnrollment;
+export async function findUsersForCourse(courseId) {
+  const enrollments = await model.find({ course: courseId }).populate("user");
+  return enrollments.map((enrollment) => enrollment.user);
 }
 
-export function unenrollUserFromCourse(userId, courseId) {
-  const initialLength = Database.enrollments.length;
-  Database.enrollments = Database.enrollments.filter(
-    (enrollment) => !(enrollment.user === userId && enrollment.course === courseId)
-  );
-  if (Database.enrollments.length < initialLength) {
-    return { status: "OK", message: "Successfully unenrolled." };
-  } else {
-    return { status: "Not Found", message: "Enrollment not found." };
-  }
+export function enrollUserInCourse(user, course) {
+  return model.create({ user, course, _id: `${user}-${course}` });
+}
+
+export function unenrollUserFromCourse(user, course) {
+  return model.deleteOne({ user, course });
 }
