@@ -9,19 +9,26 @@ export default function QuestionRoutes(app) {
     res.json(question);
   });
 
-  // Update a question
+  // Update a question and return the object
   app.put("/api/questions/:questionId", async (req, res) => {
     const { questionId } = req.params;
-    const question = await questionsDao.findQuestionById(questionId);
+    const originalQuestion = await questionsDao.findQuestionById(questionId);
+    if (!originalQuestion) {
+      return res.status(404).json({ message: "Question not found" });
+    }
+
+    // Perform the update.
     await questionsDao.updateQuestion(questionId, req.body);
-    
+    const updatedQuestion = await questionsDao.findQuestionById(questionId);
+
     // Update quiz points
-    const totalPoints = await questionsDao.calculateTotalPointsForQuiz(question.quizId);
-    await quizzesDao.updateQuiz(question.quizId, { 
+    const totalPoints = await questionsDao.calculateTotalPointsForQuiz(originalQuestion.quizId);
+    await quizzesDao.updateQuiz(originalQuestion.quizId, { 
       points: totalPoints[0]?.totalPoints || 0 
     });
     
-    res.json({ success: true });
+    // Send the full updated question object back to the frontend
+    res.json(updatedQuestion); 
   });
 
   // Delete a question

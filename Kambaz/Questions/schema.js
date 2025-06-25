@@ -9,7 +9,6 @@ const questionSchema = new mongoose.Schema(
       enum: ["multiple-choice", "true-false", "fill-blank"],
       required: true
     },
-    title: { type: String, required: true },
     points: { type: Number, default: 1 },
     question: { type: String, required: true }, // Rich text content
     order: { type: Number, default: 0 }, // For ordering questions
